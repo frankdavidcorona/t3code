@@ -21,7 +21,7 @@ import {
   ThreadStatusLabel,
   ThreadWorktreeIndicator,
 } from "./ThreadStatusIndicators";
-import { ProjectFavicon } from "./ProjectFavicon";
+import { ProjectFavicon, ProjectFolderIcon } from "./ProjectFavicon";
 import { useAtomValue } from "@effect/atom-react";
 import { autoAnimate } from "@formkit/auto-animate";
 import React, { useCallback, useEffect, memo, useMemo, useRef, useState } from "react";
@@ -2287,6 +2287,7 @@ const SidebarProjectItem = memo(function SidebarProjectItem(props: SidebarProjec
             environmentId={project.environmentId}
             cwd={project.workspaceRoot}
             faviconPath={project.faviconPath}
+            fallbackIcon={ProjectFolderIcon}
           />
           <span className="flex min-w-0 flex-1 items-center gap-2">
             <span className="truncate text-sm font-medium text-sidebar-foreground/90">
