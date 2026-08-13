@@ -1097,6 +1097,20 @@ describe("resolveThreadStatusPill", () => {
     ).toMatchObject({ label: "Working", pulse: true });
   });
 
+  it("shows connecting while the provider session is starting", () => {
+    expect(
+      resolveThreadStatusPill({
+        thread: {
+          ...baseThread,
+          session: {
+            ...baseThread.session,
+            status: "starting",
+          },
+        },
+      }),
+    ).toMatchObject({ label: "Connecting", pulse: true });
+  });
+
   it("shows plan ready when a settled plan turn has a proposed plan ready for follow-up", () => {
     expect(
       resolveThreadStatusPill({
@@ -1146,6 +1160,29 @@ describe("resolveThreadStatusPill", () => {
         },
       }),
     ).toMatchObject({ label: "Completed", pulse: false });
+  });
+
+  it("shows background work and monitoring after the foreground turn settles", () => {
+    const readyThread = {
+      ...baseThread,
+      interactionMode: "default" as const,
+      session: {
+        ...baseThread.session,
+        status: "ready" as const,
+        activeTurnId: null,
+      },
+    };
+
+    expect(
+      resolveThreadStatusPill({
+        thread: { ...readyThread, backgroundLiveness: "working" },
+      }),
+    ).toMatchObject({ label: "Working", pulse: true });
+    expect(
+      resolveThreadStatusPill({
+        thread: { ...readyThread, backgroundLiveness: "monitoring" },
+      }),
+    ).toMatchObject({ label: "Monitoring", pulse: false });
   });
 });
 
