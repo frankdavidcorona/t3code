@@ -7,7 +7,7 @@ import { pullRequestDetailToVcsStatus } from "@t3tools/client-runtime/state/pull
 import type { EnvironmentId, ThreadLinkedPullRequest, VcsStatusResult } from "@t3tools/contracts";
 import { Atom } from "effect/unstable/reactivity";
 import { CloudIcon, FolderGit2Icon, GitPullRequestIcon, TerminalIcon } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, type ComponentProps } from "react";
 import { appAtomRegistry } from "../rpc/atomRegistry";
 import { useEnvironment, usePrimaryEnvironmentId } from "../state/environments";
 import { useProject } from "../state/entities";
@@ -470,47 +470,40 @@ export function ThreadStatusLabel({
   status: ThreadStatusPill;
   compact?: boolean;
 }) {
-  if (compact) {
-    return (
-      <Tooltip>
-        <TooltipTrigger
-          render={
-            <span
-              aria-label={status.label}
-              className={`inline-flex size-3.5 shrink-0 items-center justify-center ${status.colorClass}`}
-            />
-          }
-        >
-          <span
-            className={`size-[9px] rounded-full ${status.dotClass} ${
-              status.pulse ? "animate-status-pulse" : ""
-            }`}
-          />
-        </TooltipTrigger>
-        <TooltipPopup side="top">{status.label}</TooltipPopup>
-      </Tooltip>
-    );
-  }
-
   return (
     <Tooltip>
-      <TooltipTrigger
-        render={
-          <span
-            aria-label={status.label}
-            className={`inline-flex items-center gap-1 text-[10px] ${status.colorClass}`}
-          />
-        }
-      >
-        <span
-          className={`h-1.5 w-1.5 rounded-full ${status.dotClass} ${
-            status.pulse ? "animate-status-pulse" : ""
-          }`}
-        />
-        <span className="hidden md:inline">{status.label}</span>
-      </TooltipTrigger>
+      <TooltipTrigger render={<ThreadStatusBadge status={status} compact={compact} />} />
       <TooltipPopup side="top">{status.label}</TooltipPopup>
     </Tooltip>
+  );
+}
+
+export function ThreadStatusBadge({
+  status,
+  compact = false,
+  className,
+  ...props
+}: {
+  status: ThreadStatusPill;
+  compact?: boolean;
+} & ComponentProps<"span">) {
+  return (
+    <span
+      {...props}
+      aria-label={status.label}
+      className={`${
+        compact
+          ? "inline-flex size-3.5 shrink-0 items-center justify-center"
+          : "inline-flex items-center gap-1 text-[10px]"
+      } ${status.colorClass} ${className ?? ""}`}
+    >
+      <span
+        className={`${compact ? "size-[9px]" : "h-1.5 w-1.5"} rounded-full ${
+          status.dotClass
+        } ${status.pulse ? "animate-status-pulse" : ""}`}
+      />
+      {compact ? null : <span className="hidden md:inline">{status.label}</span>}
+    </span>
   );
 }
 
