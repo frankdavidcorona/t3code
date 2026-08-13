@@ -1,4 +1,6 @@
 import type { EnvironmentId } from "@t3tools/contracts";
+import { Folder01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   getProjectFaviconCacheKey,
   isProjectFaviconFallbackUrl,
@@ -10,6 +12,10 @@ import { useAssetUrlState } from "../assets/assetUrls";
 import { cn } from "~/lib/utils";
 
 const loadedProjectFaviconSrcs = new Map<string, string>();
+
+export function ProjectFolderIcon({ className }: { readonly className?: string | undefined }) {
+  return <HugeiconsIcon aria-hidden icon={Folder01Icon} className={className} />;
+}
 
 export function ProjectFavicon(input: {
   environmentId: EnvironmentId;

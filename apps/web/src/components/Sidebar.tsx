@@ -1,5 +1,7 @@
 import { autoAnimate } from "@formkit/auto-animate";
 import { useAtomValue } from "@effect/atom-react";
+import { Message01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import * as Schema from "effect/Schema";
 import {
   DndContext,
@@ -39,10 +41,8 @@ import {
   ChevronDownIcon,
   CircleAlertIcon,
   ClockIcon,
-  FolderIcon,
   FolderPlusIcon,
   GitBranchIcon,
-  MessageSquareIcon,
   PinIcon,
   PlusIcon,
   SearchIcon,
@@ -168,7 +168,7 @@ import {
   snoozeWakeLabel,
   type SnoozePreset,
 } from "./Sidebar.snooze";
-import { ProjectFavicon } from "./ProjectFavicon";
+import { ProjectFavicon, ProjectFolderIcon } from "./ProjectFavicon";
 import { ProviderInstanceIcon } from "./chat/ProviderInstanceIcon";
 import { getTriggerDisplayModelLabel } from "./chat/providerIconUtils";
 import {
@@ -208,6 +208,10 @@ const SETTLED_TAIL_INITIAL_COUNT = 10;
 const SETTLED_TAIL_PAGE_COUNT = 25;
 // Keep the v2 key so existing preferences survive the v2-to-default rename.
 const SETTLED_SHELF_EXPANDED_KEY = "t3code:sidebar-v2:settled-expanded";
+
+function SettledThreadIcon({ className }: { readonly className?: string | undefined }) {
+  return <HugeiconsIcon aria-hidden icon={Message01Icon} className={className} />;
+}
 const SNOOZED_SHELF_EXPANDED_KEY = "t3code:sidebar-v2:snoozed-expanded";
 
 function compactSidebarTimeLabel(label: string): string {
@@ -319,6 +323,7 @@ function SidebarThreadTooltip({
                 cwd={projectCwd ?? ""}
                 faviconPath={projectFaviconPath}
                 className="size-3 shrink-0 stroke-muted-foreground"
+                fallbackIcon={ProjectFolderIcon}
               />
               <div className="min-w-0 truncate text-foreground/75">{projectTitle}</div>
             </div>
@@ -552,6 +557,7 @@ const SidebarDraftRow = memo(function SidebarDraftRow(props: {
               cwd={props.projectCwd ?? ""}
               faviconPath={props.projectFaviconPath}
               className="size-4 shrink-0"
+              fallbackIcon={ProjectFolderIcon}
             />
             <span className="min-w-0 flex-1 truncate text-xs font-medium text-secondary-label">
               {props.projectTitle}
@@ -1244,7 +1250,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: {
                 cwd={props.projectCwd ?? ""}
                 faviconPath={props.projectFaviconPath}
                 className="size-4"
-                fallbackIcon={MessageSquareIcon}
+                fallbackIcon={SettledThreadIcon}
               />
             </span>
             {title}
@@ -1398,6 +1404,7 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: {
                 cwd={props.projectCwd ?? ""}
                 faviconPath={props.projectFaviconPath}
                 className="size-4 shrink-0"
+                fallbackIcon={ProjectFolderIcon}
               />
               {props.projectTitle ? (
                 <span
@@ -1669,7 +1676,7 @@ const SidebarSearchResultRow = memo(function SidebarSearchResultRow(props: {
             cwd={props.projectCwd ?? ""}
             faviconPath={props.projectFaviconPath}
             className="size-4 shrink-0"
-            fallbackIcon={MessageSquareIcon}
+            fallbackIcon={SettledThreadIcon}
           />
           <span className="min-w-0 flex-1 truncate">{thread.title}</span>
           <span className="shrink-0 text-xs text-muted-foreground/55 tabular-nums">
@@ -3539,9 +3546,10 @@ export default function Sidebar() {
                         cwd={scopedProjectGroup.workspaceRoot}
                         faviconPath={scopedProjectGroup.faviconPath}
                         className="size-4 shrink-0"
+                        fallbackIcon={ProjectFolderIcon}
                       />
                     ) : (
-                      <FolderIcon className="size-4 shrink-0" />
+                      <ProjectFolderIcon className="size-4 shrink-0" />
                     )}
                     <span className="min-w-0 flex-1 truncate">
                       {scopedProjectGroup?.displayName ?? "All projects"}
@@ -3594,9 +3602,10 @@ export default function Sidebar() {
                                 cwd={project.workspaceRoot}
                                 faviconPath={project.faviconPath}
                                 className="size-4 shrink-0"
+                                fallbackIcon={ProjectFolderIcon}
                               />
                             ) : (
-                              <FolderIcon className="size-4 shrink-0" />
+                              <ProjectFolderIcon className="size-4 shrink-0" />
                             )}
                             <span className="min-w-0 flex-1 truncate text-sm">{item.label}</span>
                             {project ? (
