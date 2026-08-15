@@ -1421,8 +1421,12 @@ const SidebarThreadRow = memo(function SidebarThreadRow(props: {
                         <TooltipPopup side="top">Dismiss Woke notification</TooltipPopup>
                       </Tooltip>
                     ) : topStatus.kind === "badge" ? (
-                      <span className="inline-flex items-center gap-1 text-[10px]">
-                        <ThreadStatusBadge role="status" status={topStatus.status} />
+                      <span className="inline-flex items-center gap-1 text-xs">
+                        <ThreadStatusBadge
+                          role="status"
+                          status={topStatus.status}
+                          className="text-xs"
+                        />
                         {topStatus.status.label === "Working" ? (
                           <span aria-hidden className={topStatus.status.colorClass}>
                             <WorkingDuration startedAt={resolveWorkingStartedAt(thread)} />

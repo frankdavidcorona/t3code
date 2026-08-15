@@ -66,6 +66,15 @@ describe("ThreadStatusBadge", () => {
       expect(markup).not.toContain("animate-status-pulse");
     }
   });
+
+  it("allows a surface to override the legacy text size", () => {
+    const markup = renderToStaticMarkup(
+      <ThreadStatusBadge status={legacyStatuses[2]!} className="text-xs" />,
+    );
+
+    expect(markup).toContain("text-xs");
+    expect(markup).not.toContain("text-[10px]");
+  });
 });
 
 describe("ThreadWorktreeIndicator", () => {

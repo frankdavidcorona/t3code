@@ -15,6 +15,7 @@ import { useThreadRunningTerminalIds } from "../state/terminalSessions";
 import { vcsEnvironment } from "../state/vcs";
 import { useUiStateStore } from "../uiStateStore";
 import { resolveChangeRequestPresentation } from "../sourceControlPresentation";
+import { cn } from "../lib/utils";
 import { resolveThreadStatusPill, type ThreadStatusPill } from "./Sidebar.logic";
 import type { SidebarThreadSummary } from "../types";
 import { formatWorktreePathForDisplay } from "../worktreeCleanup";
@@ -376,11 +377,13 @@ export function ThreadStatusBadge({
     <span
       {...props}
       aria-label={status.label}
-      className={`${
+      className={cn(
         compact
           ? "inline-flex size-3.5 shrink-0 items-center justify-center"
-          : "inline-flex items-center gap-1 text-[10px]"
-      } ${status.colorClass} ${className ?? ""}`}
+          : "inline-flex items-center gap-1 text-[10px]",
+        status.colorClass,
+        className,
+      )}
     >
       <span
         className={`${compact ? "size-[9px]" : "h-1.5 w-1.5"} rounded-full ${
