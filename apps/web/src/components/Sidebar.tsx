@@ -243,18 +243,9 @@ function WorkingDuration(props: { startedAt: string | null }) {
     return () => window.clearInterval(id);
   }, [startedMs]);
   if (Number.isNaN(startedMs)) return null;
-  const label = formatWorkingDurationLabel(Date.now() - startedMs);
   return (
     <span className="font-mono tabular-nums">
-      {label.split(/([hms])/u).map((part) =>
-        /^[hms]$/u.test(part) ? (
-          <span key={part} className="relative top-px">
-            {part}
-          </span>
-        ) : (
-          part
-        ),
-      )}
+      {formatWorkingDurationLabel(Date.now() - startedMs)}
     </span>
   );
 }
