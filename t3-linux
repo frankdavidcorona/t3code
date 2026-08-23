@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+for command_name in git vp cargo; do
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    printf 'Error: required command not found: %s\n' "$command_name" >&2
+    exit 1
+  fi
+done
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$repo_root"
+
+official_repository="https://github.com/pingdotgg/t3code.git"
+tag_repository="$(git remote get-url upstream 2>/dev/null || printf '%s' "$official_repository")"
+latest_nightly_tag="$({
+  git ls-remote --tags --refs "$tag_repository" 'v*-nightly.*' \
+    | awk '{ sub("refs/tags/", "", $2); print $2 }' \
+    | sort -V \
+    | tail -n 1
+})"
+
+if [[ -z "$latest_nightly_tag" ]]; then
+  printf 'Error: no Nightly tags found in %s\n' "$tag_repository" >&2
+  exit 1
+fi
+
+build_version="${latest_nightly_tag#v}"
+printf 'Building T3 Code Linux AppImage from Nightly version %s\n' "$latest_nightly_tag"
+
+build_started_marker="$(mktemp)"
+trap 'rm -f "$build_started_marker"' EXIT
+
+vp run dist:desktop:artifact \
+  --platform linux \
+  --target AppImage \
+  --arch x64 \
+  --build-version "$build_version"
+
+mapfile -t built_appimages < <(
+  find "$repo_root/release" -maxdepth 1 -type f -name '*.AppImage' -newer "$build_started_marker" -print
+)
+
+if [[ "${#built_appimages[@]}" -ne 1 ]]; then
+  printf 'Error: expected one newly built AppImage, found %s\n' "${#built_appimages[@]}" >&2
+  exit 1
+fi
+
+artifact_path="$(readlink -f "${built_appimages[0]}")"
+install_parent="$HOME/.local/opt"
+install_path="$install_parent/t3-code"
+mkdir -p "$install_parent"
+stage_path="$(mktemp -d "$install_parent/.t3-code-stage.XXXXXX")"
+backup_path="$install_parent/.t3-code-backup.$$"
+
+cleanup_stage() {
+  rm -rf "$stage_path"
+}
+trap 'rm -f "$build_started_marker"; cleanup_stage' EXIT
+
+printf 'Extracting %s\n' "$artifact_path"
+(
+  cd "$stage_path"
+  "$artifact_path" --appimage-extract >/dev/null
+)
+
+extracted_path="$stage_path/squashfs-root"
+if [[ ! -x "$extracted_path/AppRun" ]]; then
+  printf 'Error: extracted AppImage does not contain an executable AppRun\n' >&2
+  exit 1
+fi
+
+if [[ -e "$install_path" ]]; then
+  mv "$install_path" "$backup_path"
+fi
+
+if ! mv "$extracted_path" "$install_path"; then
+  if [[ -e "$backup_path" ]]; then
+    mv "$backup_path" "$install_path"
+  fi
+  printf 'Error: failed to install Nightly build; previous installation restored\n' >&2
+  exit 1
+fi
+
+if [[ -e "$backup_path" ]]; then
+  rm -rf "$backup_path"
+fi
+
+printf 'Installed T3 Code Nightly at %s\n' "$install_path"
+printf 'Restart T3 Code to run the new version.\n'
